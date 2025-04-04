@@ -19,6 +19,8 @@ const ListarProdutos = ({ onBack }) => {
   const [filtroTexto, setFiltroTexto] = useState("");
   const [ordenarPor, setOrdenarPor] = useState("codigo");
   const [ordenarDirecao, setOrdenarDirecao] = useState("asc");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const handleDelete = (codigo) => {
     deletarProduto(codigo);
@@ -102,6 +104,46 @@ const ListarProdutos = ({ onBack }) => {
 
   const produtosExibidos = produtosFiltradosOrdenados();
   const totalProdutos = produtosExibidos.length;
+  const totalPages = Math.ceil(totalProdutos / itemsPerPage);
+
+  // Get current page items
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = produtosExibidos.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+
+  // Pagination controls component
+  const Pagination = () => (
+    <div className="mt-6 flex justify-center gap-2">
+      <button
+        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+        disabled={currentPage === 1}
+        className={`px-3 py-1 rounded-lg ${
+          currentPage === 1
+            ? "bg-gray-200 text-gray-500 cursor-not-allowed dark:bg-gray-700 dark:text-gray-400"
+            : "bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
+        }`}
+      >
+        Anterior
+      </button>
+      <span className="px-4 py-1 text-gray-600 dark:text-gray-300">
+        Página {currentPage} de {totalPages}
+      </span>
+      <button
+        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+        disabled={currentPage === totalPages}
+        className={`px-3 py-1 rounded-lg ${
+          currentPage === totalPages
+            ? "bg-gray-200 text-gray-500 cursor-not-allowed dark:bg-gray-700 dark:text-gray-400"
+            : "bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
+        }`}
+      >
+        Próxima
+      </button>
+    </div>
+  );
 
   if (produtoParaDetalhes) {
     return (
@@ -142,44 +184,7 @@ const ListarProdutos = ({ onBack }) => {
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white text-center">
           Produtos Cadastrados
         </h1>
-        <div className="flex flex-col sm:flex-row gap-2">
-          <button
-            onClick={() => handleExport("pdf")}
-            className="p-2 sm:px-3 sm:py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 flex items-center justify-center gap-2 min-w-[40px] sm:min-w-[80px]"
-            title="Exportar para PDF"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
-              />
-            </svg>
-            <span className="hidden sm:inline">PDF</span>
-          </button>
-          <button
-            onClick={() => handleExport("excel")}
-            className="p-2 sm:px-3 sm:py-2 text-sm bg-green-700 text-white rounded-lg hover:bg-green-800 transition-colors duration-200 flex items-center justify-center gap-2 min-w-[40px] sm:min-w-[80px]"
-            title="Exportar para Excel"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <path d="M3 3h18v18H3V3zm15 15V6H6v12h12zm-9-9h6v2h-6V9zm0 3h6v2h-6v-2z" />
-            </svg>
-            <span className="hidden sm:inline">Excel</span>
-          </button>
-        </div>
+        <div className="w-6"></div> {/* Spacer to maintain centering */}
       </div>
 
       {/* Barra de filtro e ordenação */}
@@ -290,7 +295,7 @@ const ListarProdutos = ({ onBack }) => {
             {filtroTexto && ` para a busca "${filtroTexto}"`}
           </div>
           <div className="grid gap-4">
-            {produtosExibidos.map((produto) => (
+            {currentItems.map((produto) => (
               <div
                 key={produto.codigo}
                 className="border border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-700"
@@ -396,6 +401,46 @@ const ListarProdutos = ({ onBack }) => {
                 </div>
               </div>
             ))}
+          </div>
+
+          {totalProdutos > itemsPerPage && <Pagination />}
+
+          {/* Export buttons at the bottom of the list */}
+          <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
+            <button
+              onClick={() => handleExport("pdf")}
+              className="p-3 sm:px-6 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 flex items-center justify-center gap-2"
+              title="Exportar para PDF"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                />
+              </svg>
+            </button>
+            <button
+              onClick={() => handleExport("excel")}
+              className="p-3 sm:px-6 text-sm bg-green-700 text-white rounded-lg hover:bg-green-800 transition-colors duration-200 flex items-center justify-center gap-2"
+              title="Exportar para Excel"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M3 3h18v18H3V3zm15 15V6H6v12h12zm-9-9h6v2h-6V9zm0 3h6v2h-6v-2z" />
+              </svg>
+            </button>
           </div>
         </>
       )}
@@ -537,7 +582,6 @@ const ListarProdutos = ({ onBack }) => {
           </motion.div>
         )}
       </AnimatePresence>
-
       <AnimatePresence>
         {produtoParaDeletar && (
           <motion.div
