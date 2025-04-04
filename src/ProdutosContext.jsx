@@ -114,10 +114,12 @@ export const ProdutosProvider = ({ children }) => {
                 ...p,
                 ...dadosAtualizados,
                 dataAtualizacao: new Date().toISOString(),
-                palavrasChave: dadosAtualizados.palavrasChave.map((p) =>
-                  p.trim().toLowerCase()
-                ),
-                imagem: dadosAtualizados.imagem || p.imagem, // Preserve existing image if no new one
+                palavrasChave: Array.isArray(dadosAtualizados.palavrasChave)
+                  ? dadosAtualizados.palavrasChave
+                  : dadosAtualizados.palavrasChave
+                      .split(",")
+                      .map((p) => p.trim()),
+                imagem: dadosAtualizados.imagem || p.imagem,
               }
             : p
         );

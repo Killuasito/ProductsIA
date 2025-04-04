@@ -70,9 +70,13 @@ const DetalhesProduto = ({ produto, onBack }) => {
               {produto.palavrasChave.map((palavra, index) => (
                 <span
                   key={index}
-                  className="px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 text-sm font-medium"
+                  className={`px-3 py-1 rounded-full ${
+                    typeof palavra === "object" && palavra.cor
+                      ? `${palavra.cor.bg} ${palavra.cor.text} ${palavra.cor.darkBg} ${palavra.cor.darkText}`
+                      : "bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200"
+                  } text-sm font-medium`}
                 >
-                  {palavra}
+                  {typeof palavra === "object" ? palavra.texto : palavra}
                 </span>
               ))}
             </div>

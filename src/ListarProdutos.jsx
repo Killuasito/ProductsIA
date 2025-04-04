@@ -2,10 +2,14 @@ import { useContext, useState } from "react";
 import { ProdutosContext } from "./ProdutosContext";
 import { motion, AnimatePresence } from "framer-motion";
 import DetalhesProduto from "./DetalhesProduto";
+import { useToast } from "./contexts/ToastContext";
+import { ImagePreview } from "./components/ImagePreview";
+import { ColorPicker } from "./components/ColorPicker";
 
 const ListarProdutos = ({ onBack }) => {
   const { produtos, deletarProduto, atualizarProduto, exportarProdutos } =
     useContext(ProdutosContext);
+  const { addToast } = useToast();
   const [produtoParaDeletar, setProdutoParaDeletar] = useState(null);
   const [produtoParaEditar, setProdutoParaEditar] = useState(null);
   const [produtoParaDetalhes, setProdutoParaDetalhes] = useState(null);
@@ -21,10 +25,13 @@ const ListarProdutos = ({ onBack }) => {
   const [ordenarDirecao, setOrdenarDirecao] = useState("asc");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const [previewImage, setPreviewImage] = useState(null);
+  const [selectedTagColors, setSelectedTagColors] = useState({});
 
   const handleDelete = (codigo) => {
     deletarProduto(codigo);
     setProdutoParaDeletar(null);
+    addToast("Produto excluído com sucesso!");
   };
 
   const handleEdit = (produto) => {
@@ -32,9 +39,20 @@ const ListarProdutos = ({ onBack }) => {
     setEditForm({
       codigo: produto.codigo,
       descricao: produto.descricao,
-      palavrasChave: produto.palavrasChave.join(", "),
-      imagem: produto.imagem || "", // Include existing image
+      // Corrigir a exibição de palavras-chave
+      palavrasChave: produto.palavrasChave
+        .map((tag) => (typeof tag === "object" ? tag.texto : tag))
+        .join(", "),
+      imagem: produto.imagem || "",
     });
+    // Restaurar as cores das tags
+    const tagColors = {};
+    produto.palavrasChave.forEach((tag) => {
+      if (typeof tag === "object" && tag.cor) {
+        tagColors[tag.texto] = tag.cor;
+      }
+    });
+    setSelectedTagColors(tagColors);
   };
 
   const handleImageUpload = (e) => {
@@ -55,14 +73,25 @@ const ListarProdutos = ({ onBack }) => {
     try {
       const palavrasArray = editForm.palavrasChave
         .split(",")
-        .map((p) => p.trim());
+        .map((p) => p.trim())
+        .map((palavra) => ({
+          texto: palavra,
+          cor: selectedTagColors[palavra] || {
+            bg: "bg-blue-100",
+            text: "text-blue-800",
+            darkBg: "dark:bg-blue-800",
+            darkText: "dark:text-blue-200",
+          },
+        }));
+
       atualizarProduto(produtoParaEditar.codigo, {
         ...editForm,
         palavrasChave: palavrasArray,
       });
       setProdutoParaEditar(null);
+      addToast("Produto atualizado com sucesso!");
     } catch (error) {
-      console.error("Erro ao atualizar:", error);
+      addToast(error.message, "error");
     }
   };
 
@@ -303,11 +332,14 @@ const ListarProdutos = ({ onBack }) => {
                 <div className="flex flex-col gap-2">
                   <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
                     {produto.imagem && (
-                      <div className="flex-shrink-0 w-full sm:w-auto mb-4 sm:mb-0">
+                      <div
+                        className="flex-shrink-0 w-full sm:w-auto mb-4 sm:mb-0 cursor-pointer"
+                        onClick={() => setPreviewImage(produto.imagem)}
+                      >
                         <img
                           src={produto.imagem}
                           alt={produto.codigo}
-                          className="w-full sm:w-24 h-40 sm:h-24 object-cover rounded-lg shadow-md"
+                          className="w-full sm:w-24 h-40 sm:h-24 object-cover rounded-lg shadow-md hover:opacity-90 transition-opacity"
                         />
                       </div>
                     )}
@@ -389,12 +421,16 @@ const ListarProdutos = ({ onBack }) => {
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-1 mt-2">
-                    {produto.palavrasChave.map((palavra, i) => (
+                    {produto.palavrasChave.map((tag, i) => (
                       <span
                         key={i}
-                        className="px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 text-xs font-medium"
+                        className={`px-2 py-1 rounded-full ${
+                          typeof tag === "object" && tag.cor
+                            ? `${tag.cor.bg} ${tag.cor.text} ${tag.cor.darkBg} ${tag.cor.darkText}`
+                            : "bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200"
+                        } text-xs font-medium`}
                       >
-                        {palavra}
+                        {typeof tag === "object" ? tag.texto : tag}
                       </span>
                     ))}
                   </div>
@@ -551,17 +587,37 @@ const ListarProdutos = ({ onBack }) => {
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Palavras-chave
                   </label>
-                  <input
-                    type="text"
-                    value={editForm.palavrasChave}
-                    onChange={(e) =>
-                      setEditForm({
-                        ...editForm,
-                        palavrasChave: e.target.value,
-                      })
-                    }
-                    className="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white"
-                  />
+                  <div className="space-y-2">
+                    {editForm.palavrasChave.split(",").map((palavra, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={palavra.trim()}
+                          onChange={(e) => {
+                            const palavras = editForm.palavrasChave.split(",");
+                            palavras[index] = e.target.value;
+                            setEditForm({
+                              ...editForm,
+                              palavrasChave: palavras.join(","),
+                            });
+                          }}
+                          className="flex-1 p-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white"
+                        />
+                        <ColorPicker
+                          selectedColor={selectedTagColors[palavra.trim()]}
+                          onSelect={(color) => {
+                            setSelectedTagColors((prev) => ({
+                              ...prev,
+                              [palavra.trim()]: color,
+                            }));
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Separe as palavras-chave por vírgula
+                  </p>
                 </div>
               </div>
               <div className="flex justify-end gap-3 mt-6">
@@ -624,6 +680,10 @@ const ListarProdutos = ({ onBack }) => {
           </motion.div>
         )}
       </AnimatePresence>
+      <ImagePreview
+        image={previewImage}
+        onClose={() => setPreviewImage(null)}
+      />
     </motion.div>
   );
 };

@@ -21,7 +21,8 @@ const Dashboard = ({ onBack }) => {
     const contagemPalavras = {};
     produtos.forEach((produto) => {
       produto.palavrasChave.forEach((palavra) => {
-        contagemPalavras[palavra] = (contagemPalavras[palavra] || 0) + 1;
+        const texto = typeof palavra === "object" ? palavra.texto : palavra;
+        contagemPalavras[texto] = (contagemPalavras[texto] || 0) + 1;
       });
     });
 
@@ -250,12 +251,16 @@ const Dashboard = ({ onBack }) => {
                       {produto.descricao}
                     </p>
                     <div className="flex flex-wrap gap-1 mt-2">
-                      {produto.palavrasChave.slice(0, 3).map((palavra, i) => (
+                      {produto.palavrasChave.slice(0, 3).map((tag, i) => (
                         <span
                           key={i}
-                          className="px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 text-xs font-medium"
+                          className={`px-2 py-1 rounded-full ${
+                            typeof tag === "object" && tag.cor
+                              ? `${tag.cor.bg} ${tag.cor.text} ${tag.cor.darkBg} ${tag.cor.darkText}`
+                              : "bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200"
+                          } text-xs font-medium`}
                         >
-                          {palavra}
+                          {typeof tag === "object" ? tag.texto : tag}
                         </span>
                       ))}
                       {produto.palavrasChave.length > 3 && (

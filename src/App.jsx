@@ -7,6 +7,7 @@ import ListarProdutos from "./ListarProdutos";
 import Dashboard from "./Dashboard"; // Importando o novo componente
 import { motion, AnimatePresence } from "framer-motion";
 import { UserProvider, useUser } from "./UserContext";
+import { ToastProvider } from "./contexts/ToastContext";
 
 function NamePrompt({ onSubmit }) {
   const [name, setName] = useState("");
@@ -429,9 +430,11 @@ function App() {
   return (
     <ThemeProvider>
       <UserProvider>
-        <ProdutosProvider>
-          <MainContent />
-        </ProdutosProvider>
+        <ToastProvider>
+          <ProdutosProvider>
+            <MainContent />
+          </ProdutosProvider>
+        </ToastProvider>
       </UserProvider>
     </ThemeProvider>
   );
