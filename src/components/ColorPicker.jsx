@@ -51,7 +51,7 @@ export function ColorPicker({ onSelect, selectedColor }) {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`
-          flex items-center gap-2 px-3 py-2 rounded-lg
+          flex items-center gap-2 px-3 py-2 rounded-lg w-full sm:w-auto
           bg-gray-100 dark:bg-gray-700 
           hover:bg-gray-200 dark:hover:bg-gray-600
           border border-gray-300 dark:border-gray-600
@@ -69,40 +69,56 @@ export function ColorPicker({ onSelect, selectedColor }) {
       </button>
 
       {isOpen && (
-        <div
-          className="absolute top-full left-0 mt-2 p-3 
-                        bg-white dark:bg-gray-800 
-                        rounded-lg shadow-xl 
-                        border border-gray-200 dark:border-gray-700 
-                        z-50 min-w-[160px]"
-        >
-          <div className="grid gap-2">
-            {defaultColors.map((color, index) => (
-              <button
-                key={index}
-                onClick={() => {
-                  onSelect(color);
-                  setIsOpen(false);
-                }}
-                className={`
-                  flex items-center gap-3 p-2 w-full rounded-lg
-                  hover:bg-gray-100 dark:hover:bg-gray-700
-                  transition-colors duration-200
-                  ${
-                    selectedColor === color
-                      ? "bg-gray-100 dark:bg-gray-700"
-                      : ""
-                  }
-                `}
-              >
-                <div className={`w-4 h-4 rounded-full ${color.preview}`} />
-                <span className="text-sm text-gray-700 dark:text-gray-200">
-                  {color.name}
-                </span>
-              </button>
-            ))}
+        <>
+          {/* Overlay to close color picker */}
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setIsOpen(false)}
+          />
+
+          <div
+            className={`
+            fixed sm:absolute 
+            left-1/2 sm:left-0 
+            bottom-4 sm:bottom-auto 
+            sm:top-full 
+            -translate-x-1/2 sm:translate-x-0
+            mt-2 p-3
+            bg-white dark:bg-gray-800 
+            rounded-lg shadow-xl 
+            border border-gray-200 dark:border-gray-700 
+            z-50 w-[90vw] sm:w-[200px]
+            sm:mt-2
+          `}
+          >
+            <div className="grid grid-cols-2 sm:grid-cols-1 gap-2">
+              {defaultColors.map((color, index) => (
+                <button
+                  key={index}
+                  onClick={() => {
+                    onSelect(color);
+                    setIsOpen(false);
+                  }}
+                  className={`
+                    flex items-center gap-3 p-2 w-full rounded-lg
+                    hover:bg-gray-100 dark:hover:bg-gray-700
+                    transition-colors duration-200
+                    ${
+                      selectedColor === color
+                        ? "bg-gray-100 dark:bg-gray-700"
+                        : ""
+                    }
+                  `}
+                >
+                  <div className={`w-4 h-4 rounded-full ${color.preview}`} />
+                  <span className="text-sm text-gray-700 dark:text-gray-200">
+                    {color.name}
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );
