@@ -133,11 +133,13 @@ const DetalhesProduto = ({ produto, onBack }) => {
           <div className="flex justify-center">
             <img
               src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
-                JSON.stringify({
-                  codigo: produto.codigo,
-                  descricao: produto.descricao,
-                  palavrasChave: produto.palavrasChave,
-                })
+                `Código: ${produto.codigo}
+                Descrição: ${produto.descricao}
+                Palavras-chave: ${produto.palavrasChave
+                  .map((palavra) =>
+                    typeof palavra === "object" ? palavra.texto : palavra
+                  )
+                  .join(", ")}`
               )}`}
               alt="QR Code do produto"
               className="bg-white p-4 rounded-lg"
