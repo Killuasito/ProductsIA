@@ -142,10 +142,10 @@ const ListarProdutos = ({ onBack }) => {
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white text-center">
           Produtos Cadastrados
         </h1>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <button
             onClick={() => handleExport("pdf")}
-            className="px-3 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 flex items-center gap-2"
+            className="p-2 sm:px-3 sm:py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 flex items-center justify-center gap-2 min-w-[40px] sm:min-w-[80px]"
             title="Exportar para PDF"
           >
             <svg
@@ -162,11 +162,11 @@ const ListarProdutos = ({ onBack }) => {
                 d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
               />
             </svg>
-            PDF
+            <span className="hidden sm:inline">PDF</span>
           </button>
           <button
             onClick={() => handleExport("excel")}
-            className="px-3 py-2 text-sm bg-green-700 text-white rounded-lg hover:bg-green-800 transition-colors duration-200 flex items-center gap-2"
+            className="p-2 sm:px-3 sm:py-2 text-sm bg-green-700 text-white rounded-lg hover:bg-green-800 transition-colors duration-200 flex items-center justify-center gap-2 min-w-[40px] sm:min-w-[80px]"
             title="Exportar para Excel"
           >
             <svg
@@ -177,7 +177,7 @@ const ListarProdutos = ({ onBack }) => {
             >
               <path d="M3 3h18v18H3V3zm15 15V6H6v12h12zm-9-9h6v2h-6V9zm0 3h6v2h-6v-2z" />
             </svg>
-            Excel
+            <span className="hidden sm:inline">Excel</span>
           </button>
         </div>
       </div>
