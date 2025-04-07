@@ -138,7 +138,11 @@ export const ProdutosProvider = ({ children }) => {
 
   // Função auxiliar para normalizar e separar palavras
   const normalizarTexto = (texto) => {
-    return texto
+    // Convert input to string and handle null/undefined
+    if (!texto) return [];
+    const str = String(texto);
+
+    return str
       .toLowerCase()
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
@@ -191,6 +195,15 @@ export const ProdutosProvider = ({ children }) => {
           .map((item) => ({
             ...item.produto,
             relevancia: Math.round(item.similaridade * 100),
+            // Ensure any complex objects are converted to strings
+            palavrasChave: Array.isArray(item.produto.palavrasChave)
+              ? item.produto.palavrasChave.map((pc) => {
+                  // Check if palavra-chave is an object and convert it to string if needed
+                  return typeof pc === "object" && pc !== null
+                    ? pc.texto || JSON.stringify(pc)
+                    : pc;
+                })
+              : [],
           }));
       } catch (err) {
         setError("Erro ao buscar produtos: " + err.message);

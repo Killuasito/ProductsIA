@@ -8,6 +8,8 @@ import Dashboard from "./Dashboard"; // Importando o novo componente
 import { motion, AnimatePresence } from "framer-motion";
 import { UserProvider, useUser } from "./UserContext";
 import { ToastProvider } from "./contexts/ToastContext";
+import { FavoritosProvider } from "./contexts/FavoritosContext";
+import Favoritos from "./Favoritos";
 
 function NamePrompt({ onSubmit }) {
   const [name, setName] = useState("");
@@ -84,6 +86,8 @@ function MainContent() {
         return <ListarProdutos onBack={() => navigateTo("home")} />;
       case "dashboard":
         return <Dashboard onBack={() => navigateTo("home")} />;
+      case "favoritos":
+        return <Favoritos onBack={() => navigateTo("home")} />;
       default:
         return (
           <div className="max-w-xl w-full mx-auto bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 shadow-lg rounded-xl p-8 mt-8 border border-gray-200 dark:border-gray-700">
@@ -245,6 +249,51 @@ function MainContent() {
                     <p className="text-purple-100">
                       Visualizar todos os produtos cadastrados
                     </p>
+                  </div>
+                  <div className="ml-auto transform group-hover:translate-x-1 transition-transform duration-200">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-6 w-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              {/* Novo botão para Favoritos */}
+              <div
+                onClick={() => navigateTo("favoritos")}
+                className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer group"
+              >
+                <div className="flex items-center">
+                  <div className="p-3 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-100 bg-opacity-20 rounded-lg mr-4">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-8 w-8"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold mb-1">Favoritos</h3>
+                    <p className="text-yellow-100">Ver produtos favoritos</p>
                   </div>
                   <div className="ml-auto transform group-hover:translate-x-1 transition-transform duration-200">
                     <svg
@@ -432,7 +481,9 @@ function App() {
       <UserProvider>
         <ToastProvider>
           <ProdutosProvider>
-            <MainContent />
+            <FavoritosProvider>
+              <MainContent />
+            </FavoritosProvider>
           </ProdutosProvider>
         </ToastProvider>
       </UserProvider>
