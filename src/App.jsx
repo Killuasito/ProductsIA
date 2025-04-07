@@ -9,15 +9,22 @@ import { motion, AnimatePresence } from "framer-motion";
 import { UserProvider, useUser } from "./UserContext";
 import { ToastProvider } from "./contexts/ToastContext";
 import { FavoritosProvider } from "./contexts/FavoritosContext";
+import { KeywordsProvider } from "./contexts/KeywordsContext";
 import Favoritos from "./Favoritos";
+import GerenciarKeywords from "./GerenciarKeywords";
 
 function NamePrompt({ onSubmit }) {
   const [name, setName] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (name.trim()) {
-      onSubmit(name);
+      setIsSubmitting(true);
+      // Add a slight delay for animation effect
+      setTimeout(() => {
+        onSubmit(name);
+      }, 1200);
     }
   };
 
@@ -27,30 +34,121 @@ function NamePrompt({ onSubmit }) {
       animate={{ opacity: 1, y: 0 }}
       className="w-full max-w-md mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8"
     >
+      <div className="flex justify-center mb-6">
+        <div className="relative w-24 h-24">
+          {/* Rotating circle animation */}
+          <div className="absolute inset-0 rounded-full border-t-4 border-b-4 border-blue-500 animate-[spin_3s_linear_infinite]"></div>
+          <div className="absolute inset-3 rounded-full flex items-center justify-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-10 w-10 text-blue-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+              />
+            </svg>
+          </div>
+        </div>
+      </div>
+
       <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6 text-center">
         Bem-vindo ao Products IA
       </h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-gray-700 dark:text-gray-300 mb-2">
-            Como posso te chamar?
-          </label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:outline-none duration-250 focus:ring-blue-500 dark:bg-gray-700 dark:text-white transition-all"
-            placeholder="Digite seu nome"
-            required
-          />
-        </div>
-        <button
-          type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
-        >
-          Continuar
-        </button>
-      </form>
+      <p className="text-gray-600 dark:text-gray-300 mb-6 text-center">
+        Seu assistente inteligente para gerenciamento de produtos e
+        palavras-chave. Vamos começar personalizando sua experiência!
+      </p>
+
+      <AnimatePresence>
+        {isSubmitting ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="text-center py-10"
+          >
+            <motion.div
+              animate={{
+                scale: [1, 1.2, 1],
+                rotate: [0, 360],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+              className="mx-auto mb-4 text-blue-500 w-16 h-16"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-full w-full"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </motion.div>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-lg text-gray-700 dark:text-gray-300"
+            >
+              Preparando sua experiência, {name}...
+            </motion.p>
+          </motion.div>
+        ) : (
+          <motion.form
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onSubmit={handleSubmit}
+            className="space-y-4"
+          >
+            <div>
+              <label className="block text-gray-700 dark:text-gray-300 mb-2">
+                Como posso te chamar?
+              </label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:outline-none duration-250 focus:ring-blue-500 dark:bg-gray-700 dark:text-white transition-all"
+                placeholder="Digite seu nome"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center"
+            >
+              <span>Continuar</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 ml-2"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          </motion.form>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
@@ -88,6 +186,8 @@ function MainContent() {
         return <Dashboard onBack={() => navigateTo("home")} />;
       case "favoritos":
         return <Favoritos onBack={() => navigateTo("home")} />;
+      case "keywords":
+        return <GerenciarKeywords onBack={() => navigateTo("home")} />;
       default:
         return (
           <div className="max-w-xl w-full mx-auto bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 shadow-lg rounded-xl p-8 mt-8 border border-gray-200 dark:border-gray-700">
@@ -117,8 +217,11 @@ function MainContent() {
               </div>
 
               <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-3">
-                Olá, {userName}!
+                Olá, {userName}! 👋
               </h1>
+              <p className="text-gray-600 dark:text-gray-400 mb-2">
+                Que bom ter você por aqui!
+              </p>
               <p className="text-gray-600 dark:text-gray-400 mb-6">
                 O que você gostaria de fazer hoje?
               </p>
@@ -360,6 +463,55 @@ function MainContent() {
                   </div>
                 </div>
               </div>
+
+              {/* Novo botão para Gerenciar Keywords */}
+              <div
+                onClick={() => navigateTo("keywords")}
+                className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer group"
+              >
+                <div className="flex items-center">
+                  <div className="p-3 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-100 bg-opacity-20 rounded-lg mr-4">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-8 w-8"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold mb-1">
+                      Palavras-chave
+                    </h3>
+                    <p className="text-pink-100">
+                      Gerenciar palavras-chave globais
+                    </p>
+                  </div>
+                  <div className="ml-auto transform group-hover:translate-x-1 transition-transform duration-200">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-6 w-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         );
@@ -481,9 +633,11 @@ function App() {
       <UserProvider>
         <ToastProvider>
           <ProdutosProvider>
-            <FavoritosProvider>
-              <MainContent />
-            </FavoritosProvider>
+            <KeywordsProvider>
+              <FavoritosProvider>
+                <MainContent />
+              </FavoritosProvider>
+            </KeywordsProvider>
           </ProdutosProvider>
         </ToastProvider>
       </UserProvider>

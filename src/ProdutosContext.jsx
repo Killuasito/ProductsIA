@@ -60,14 +60,33 @@ export const ProdutosProvider = ({ children }) => {
       }
 
       try {
+        // Normalize palavrasChave to ensure all entries have the correct format
+        const normalizedPalavrasChave = novoProduto.palavrasChave.map((p) => {
+          if (typeof p === "string") {
+            return {
+              texto: p.toLowerCase(),
+              cor: {
+                bg: "bg-blue-100",
+                text: "text-blue-800",
+                darkBg: "dark:bg-blue-800",
+                darkText: "dark:text-blue-200",
+              },
+            };
+          } else if (typeof p === "object" && p !== null) {
+            return {
+              ...p,
+              texto: p.texto ? p.texto.toLowerCase() : "",
+            };
+          }
+          return p;
+        });
+
         const novaLista = [
           ...produtos,
           {
             ...novoProduto,
             dataCriacao: new Date().toISOString(),
-            palavrasChave: novoProduto.palavrasChave.map((p) =>
-              p.trim().toLowerCase()
-            ),
+            palavrasChave: normalizedPalavrasChave,
           },
         ];
         setProdutos(novaLista);
