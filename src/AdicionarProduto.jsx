@@ -1,6 +1,8 @@
 import { useState, useContext } from "react";
 import { ProdutosContext } from "./ProdutosContext";
 import { motion } from "framer-motion";
+import { KeywordGenerator } from "./components/KeywordGenerator";
+import { generateKeywords } from "./utils/keywordUtils";
 
 const AdicionarProduto = ({ onBack }) => {
   const { adicionarProduto } = useContext(ProdutosContext);
@@ -21,6 +23,26 @@ const AdicionarProduto = ({ onBack }) => {
         setImagem(reader.result);
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const handleGeneratedKeywords = async (keywords) => {
+    if (!descricao) {
+      setMensagem("Digite a descrição do produto primeiro!");
+      setTipoMensagem("erro");
+      return;
+    }
+
+    setPalavrasChave(keywords.join(", "));
+
+    if (keywords.length > 0) {
+      setMensagem("Palavras-chave geradas com sucesso!");
+      setTipoMensagem("sucesso");
+    } else {
+      setMensagem(
+        "Não foi possível gerar palavras-chave. Tente uma descrição mais detalhada."
+      );
+      setTipoMensagem("erro");
     }
   };
 
@@ -159,7 +181,7 @@ const AdicionarProduto = ({ onBack }) => {
           >
             Palavras-chave
           </label>
-          <div className="relative">
+          <div className="relative flex items-center">
             <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 dark:text-gray-400">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -184,9 +206,11 @@ const AdicionarProduto = ({ onBack }) => {
               className="border pl-10 p-3 w-full rounded-lg focus:ring-2 focus:outline-none border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 dark:bg-gray-700 dark:text-white"
               placeholder="Ex: eletrônico, smartphone, tecnologia"
             />
+            <KeywordGenerator onSelect={handleGeneratedKeywords} />
           </div>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            Separe as palavras-chave por vírgula
+            Separe as palavras-chave por vírgula ou use o botão para gerar
+            automaticamente (geração automática pode conter erros)
           </p>
         </div>
 
